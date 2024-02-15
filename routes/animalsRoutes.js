@@ -1,18 +1,18 @@
+// routes/animalsRoutes.js
 const express = require('express');
 const router = express.Router();
 
-// Mock data: Pretend this is our little database for now
+// Mock data for demonstration
 let animals = [
   { id: 1, name: 'Elephant', species: 'Mammal' },
   { id: 2, name: 'Python', species: 'Reptile' }
 ];
 
-// GET all animals
+// Routes for handling animals data
 router.get('/animals', (req, res) => {
   res.json(animals);
 });
 
-// POST a new animal
 router.post('/animals', (req, res) => {
   const { name, species } = req.body;
   const newAnimal = { id: animals.length + 1, name, species };
@@ -20,14 +20,14 @@ router.post('/animals', (req, res) => {
   res.status(201).send(newAnimal);
 });
 
-// GET an animal by ID
 router.get('/animals/:id', (req, res) => {
   const { id } = req.params;
   const animal = animals.find(animal => animal.id === parseInt(id));
   if (!animal) {
-    return res.status(404).send('Animal not found.');
+    res.status(404).send('Animal not found.');
+  } else {
+    res.send(animal);
   }
-  res.send(animal);
 });
 
 module.exports = router;

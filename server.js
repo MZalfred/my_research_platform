@@ -1,12 +1,14 @@
 const express = require('express');
 const app = express();
 const apiRoutes = require('./routes/apiRoutes');
-
-// Use routes
-app.use(apiRoutes);
+const animalsRoutes = require('./routes/animalsRoutes');
 
 // Middleware
 app.use(express.json()); // for parsing application/json
+
+// Use routes
+app.use(apiRoutes);
+app.use(animalsRoutes);
 
 // Define a simple route for GET requests to the root URL
 app.get('/', (req, res) => {
