@@ -1,38 +1,22 @@
 const express = require('express');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const User = require('../models/User');
+const { pool } = require('../db'); // Assume you've exported your pool instance from a db.js file
 
 const router = express.Router();
 
 // Register route
 router.post('/register', async (req, res) => {
-  try {
-    const { username, password } = req.body;
-    const user = new User({ username, password });
-    await user.save();
+  const { username, password } = req.body;
+  const hashedPassword = await bcrypt.hash(password, 8);
 
-    res.status(201).send({ message: "User created successfully" });
-  } catch (error) {
-    res.status(400).send(error);
-  }
-});
-
-// Login route
-router.post('/login', async (req, res) => {
-  try {
-    const { username, password } = req.body;
-    const user = await User.findOne({ username });
-    if (!user || !(await bcrypt.compare(password, user.password))) {
-      return res.status(401).send({ message: "Authentication failed" });
+  pool.query('INSERT INTO users (username, password) VALUES ($1, $2) RETURNING id', [username, hashedPassword], (error, results) => {
+    if (error) {
+      return res.status(400).send(error);
     }
-
-    const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '1d' });
-
-    res.status(200).send({ token });
-  } catch (error) {
-    res.status(400).send(error);
-  }
+    res.status(201).send(`User added with ID: ${results.rows[0].id}`);
+  });
 });
 
+// Export the router
 module.exports = router;
