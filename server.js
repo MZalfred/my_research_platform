@@ -1,22 +1,27 @@
 const express = require('express');
-const mongoose = require('mongoose');
+const { Pool } = require('pg'); // Import Pool class from pg module
 const authRoutes = require('./routes/authRoutes');
 require('dotenv').config();
 
 const app = express();
 
-// After app.use(express.json());
+// Middleware for parsing JSON bodies
+app.use(express.json());
+
+// Use the auth routes
 app.use('/api/auth', authRoutes);
 
-mongoose.connect(process.env.MONGODB_URI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  })
-  .then(() => console.log("MongoDB connected"))
-  .catch(err => console.log(err));
-  
+// Create a new pool instance and pass in your PostgreSQL connection information
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+  // If using SSL connection (e.g., in production with Heroku), uncomment the following line
+  // ssl: { rejectUnauthorized: false }
+});
 
-app.use(express.json()); // Middleware for parsing JSON bodies
+// Test PostgreSQL connection
+pool.connect()
+  .then(() => console.log("PostgreSQL connected"))
+  .catch(err => console.log(err));
 
 const PORT = process.env.PORT || 5000;
 
