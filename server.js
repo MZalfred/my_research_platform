@@ -1,22 +1,20 @@
 const express = require('express');
 const app = express();
-const apiRoutes = require('./routes/apiRoutes');
-const animalsRoutes = require('./routes/animalsRoutes');
+const apiRoutes = require('./routes/apiRoutes'); // Import apiRoutes
+const animalsRoutes = require('./routes/animalsRoutes'); // Import animalsRoutes
 
-// Middleware
-app.use(express.json()); // for parsing application/json
+app.use(express.json()); // Middleware for parsing application/json
 
-// Use routes
-app.use(apiRoutes);
-app.use(animalsRoutes);
+// Use both sets of routes with the Express app
+app.use('/api', apiRoutes); // Prefix all routes in apiRoutes with "/api"
+app.use('/api', animalsRoutes); // Also prefix animalsRoutes to keep API routes consistent
 
-// Define a simple route for GET requests to the root URL
+// A simple route for the root URL
 app.get('/', (req, res) => {
   res.send('Hello World!');
 });
 
-// Set the application to listen on a specific port
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3000; // Use the environment's port if specified, otherwise use 3000
 app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
+  console.log(`Server running on port ${PORT}`);
 });
